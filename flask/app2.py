@@ -2,6 +2,9 @@ from flask import Flask, request, send_file, render_template
 import cv2
 import numpy as np
 import os
+import shutil
+from os.path import isfile
+from ultralytics import YOLO
 
 app = Flask(__name__)
 
@@ -44,7 +47,6 @@ def atmosdehaze(frame):
     scene_radiance = (scene_radiance * 255).astype(np.uint8)
     return scene_radiance
 
-
 def dehaze_images(frame_array):
     dehazed_frames = []
     for frame in frame_array:
@@ -55,43 +57,73 @@ def dehaze_images(frame_array):
     dehazed_array = np.array(dehazed_frames)
     return dehazed_array
 
+def objectdectect(source_images):
+    output_folder = 'temp_images'
+    os.makedirs(output_folder, exist_ok=True)
+
+    # Save the images from the array to the folder
+    for i, image in enumerate(source_images):
+        image_filename = os.path.join(output_folder, f'image_{i}.jpg')
+        cv2.imwrite(image_filename, image)
+
+    model = YOLO('yolov8n.pt')  # Pretrained YOLOv8n model
+    model(source='temp_images', save=True, project='Project')
+
+    # Create an empty list to store the new images with bounding boxes
+    output_images = []
+
+    # Define the directory where the saved results are located
+    project_directory = 'project'
+
+    # List the files in the 'project/predict' directory
+    result_files = os.listdir(os.path.join('Project/predict'))
+
+    # Sort the image files by name
+    sorted_result_files = sorted(result_files, key=lambda x: int(os.path.splitext(x)[0].split('_')[1]))
+
+    # Load the sorted image files into an array
+    output_images = [cv2.imread(os.path.join('Project/predict', filename)) for filename in sorted_result_files]
+
+    shutil.rmtree('Project')
+    return output_images
+
 def dehazed2video(dehazed_array, pathOut, fps=30):
     size = (dehazed_array[0].shape[1], dehazed_array[0].shape[0])
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(pathOut, fourcc, fps, size)
-
+    out = cv2.VideoWriter(pathOut, cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
     for i in range(len(dehazed_array)):
         out.write(dehazed_array[i])
     out.release()
 
-def record_and_dehaze_video(output_path, duration=10, fps=30):
-    cap = cv2.VideoCapture(0)  # 0 represents the default camera
-    frames = []
-    start_time = cv2.getTickCount()
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        frames.append(frame)
-        current_time = cv2.getTickCount()
-        if (current_time - start_time) / cv2.getTickFrequency() >= duration:
-            break
-    cap.release()
+def main(input_video, output_video, enable_object_detection=False):
+    frame_array = video2framesarray(input_video)
+    dehazed_array = dehaze_images(frame_array)
 
-    dehazed_array = dehaze_images(frames)
-    dehazed2video(dehazed_array, output_path, fps)
+    if enable_object_detection:
+        dehazed_array = objectdectect(dehazed_array)
+
+    dehazed2video(dehazed_array, output_video)
 
 @app.route("/")
 def load_page():
-    return render_template('app.html')
+    return render_template('app2.html')
 
 @app.route("/dehaze", methods=["POST"])
 def dehaze_endpoint():
-    output_video = "output_video1.mp4"
+    file = request.files["file"]
+    fps = int(request.form["fps"])
+    enable_object_detection = request.form.get("object_detection") == "on"
 
-    record_and_dehaze_video(output_video)
+    if file and file.filename != '' and file.filename.endswith(".mp4"):
+        input_video = "temp_video.mp4"
+        output_video = "output_video1.mp4"
 
-    return send_file(output_video, mimetype="video/mp4")
+        file.save(input_video)
+
+        main(input_video, output_video, enable_object_detection)
+
+        return send_file(output_video, mimetype="video/mp4")
+    else:
+        return {"error": "Only MP4 videos are supported."}
 
 if __name__ == '__main__':
     app.debug = True
