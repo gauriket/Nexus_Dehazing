@@ -12,14 +12,24 @@ def video2framesarray(videoinput):
     cap = cv2.VideoCapture(videoinput)
     frame_number = 0
     frame_array = []
+    fps = 0
+
     while True:
         ret, frame = cap.read()
         if not ret:
             break
         frame_array.append(frame)
         frame_number += 1
+
+        if frame_number == 1:
+            start_time = cv2.getTickCount()
+        
+    end_time = cv2.getTickCount()
+    time = (end_time - start_time) / cv2.getTickFrequency()
+    fps = frame_number / (time * 10)
+
     cap.release()
-    return frame_array
+    return frame_array, fps
 
 def atmosdehaze(frame):
     # Convert the image to floating point representation
@@ -87,21 +97,12 @@ def objectdectect(source_images):
     shutil.rmtree('Project')
     return output_images
 
-def dehazed2video(dehazed_array, pathOut, fps=30):
+def dehazed2video(dehazed_array, pathOut, fps=40):
     size = (dehazed_array[0].shape[1], dehazed_array[0].shape[0])
     out = cv2.VideoWriter(pathOut, cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
     for i in range(len(dehazed_array)):
         out.write(dehazed_array[i])
     out.release()
-
-def main(input_video, output_video, enable_object_detection=False):
-    frame_array = video2framesarray(input_video)
-    dehazed_array = dehaze_images(frame_array)
-
-    if enable_object_detection:
-        dehazed_array = objectdectect(dehazed_array)
-
-    dehazed2video(dehazed_array, output_video)
 
 @app.route("/")
 def load_page():
@@ -110,7 +111,6 @@ def load_page():
 @app.route("/dehaze", methods=["POST"])
 def dehaze_endpoint():
     file = request.files["file"]
-    fps = int(request.form["fps"])
     enable_object_detection = request.form.get("object_detection") == "on"
 
     if file and file.filename != '' and file.filename.endswith(".mp4"):
@@ -119,7 +119,16 @@ def dehaze_endpoint():
 
         file.save(input_video)
 
-        main(input_video, output_video, enable_object_detection)
+        frame_array, fps = video2framesarray(input_video)
+
+        dehazed_array = dehaze_images(frame_array)
+
+        if enable_object_detection:
+            source_images = dehazed_array
+            output_images = objectdectect(source_images)
+            dehazed2video(output_images, output_video, fps)
+        else:
+            dehazed2video(dehazed_array, output_video, fps)
 
         return send_file(output_video, mimetype="video/mp4")
     else:

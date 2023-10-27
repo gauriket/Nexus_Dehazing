@@ -11,30 +11,17 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(to right, #A3FCFF, #6FDBE3); /* Linear gradient background for the navbar */
-            padding: 10px;
-            width: 100%;
-            margin: 0 0 0 150px;
-            border-radius: 10px 0 0 10px;
-        }
-
-        .navbar h1 {
-            margin: 0;
-            padding: 10px;
-            color: #000;
+            background-image: conic-gradient(from 90deg, #3b41c5, #a981bb, #3b41c5);
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-color: orange;
         }
 
         .Form {
             border: 1px solid #ccc;
             padding: 50px;
             border-radius: 10px;
-            background: linear-gradient(to right, #D1FDFF, #A3FCFF); /* Linear gradient background for the form */
+            background: linear-gradient(to right, #a981bb, #3b41c5); /* Linear gradient background for the form */
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -45,20 +32,21 @@
             border: 1px solid #ccc;
             padding: 20px;
             margin: 10px;
-            background: linear-gradient(to right, #A3FCFF, #6FDBE3); /* Linear gradient background for the button */
+            background: linear-gradient(to right, #a981bb, #6FDBE3); /* Linear gradient background for the button */
             color: #000;
             cursor: pointer;
             border-radius: 10px;
         }
 
         #upload-button:hover {
-            background: linear-gradient(to right, #6FDBE3, #A3FCFF); /* Gradient transition on hover */
+            background: linear-gradient(to left, #a981bb, #a981bb); /* Gradient transition on hover */
+            transition:0.5
             margin: 10px;
             border-radius: 10px;
         }
 
         #upload-button:active {
-            background: linear-gradient(to right, #A3FCFF, #6FDBE3); /* Gradient transition on click */
+            background: linear-gradient(to right,  #3b41c5, #3b41c5); /* Gradient transition on click */
             margin: 10px;
             border-radius: 10px;
         }
@@ -68,28 +56,71 @@
             margin: 10px;
             border-radius: 10px;
             padding: 20px;
-            background: linear-gradient(to right, #E9FEFF, #D1FDFF); /* Linear gradient background for the input field */
+            background: linear-gradient(to right, #a981bb, #6FDBE3); /* Linear gradient background for the input field */
         }
 
         #but {
-            border: 1px solid #ccc;
-            background: linear-gradient(to right, #A3FCFF, #6FDBE3); /* Linear gradient background for the button */
-            margin: 10px;
-            border-radius: 10px;
-            padding: 20px;
+                --color: #00A97F;
+                padding: 20px;
+                background: linear-gradient(to right, #a981bb, #6FDBE3); /* Linear gradient background for the button */
+                position: relative;
+                overflow: hidden;
+                cursor: pointer;
+                transition: .5s;
+                font-weight: 400;
+                font-size: 17px;
+                border: 1px solid #ccc;
+                border-radius:10px;
+                font-family: inherit;
+                text-transform: uppercase;
+                color: var(--color);
+                z-index: 1;
+                color: #000000;
         }
+        .but::before, .button::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 50px;
+            transform: translate(-50%, -50%);
+            position: absolute;
+            border-radius: 50%;
+            z-index: -1;
+            background-color: var(--color);
+            transition: 1s ease;
+           }
+           
+           .but::before {
+            top: -1em;
+            left: -1em;
+           }
+           
+           .but::after {
+            left: calc(100% + 1em);
+            top: calc(100% + 1em);
+           }
+           
+           .but:hover::before, .button:hover::after {
+            height: 410px;
+            width: 410px;
+           }
+           
+           .but:hover {
+            background: linear-gradient(to left, #a981bb, #a981bb); /* Gradient transition on hover */;
+           }
+           
+           .but:active {
+            filter: brightness(.8);
+           }
     </style>
     <title>Dehazing</title>
 </head>
 
 <body>
-    <div class="navbar">
-        <h1>Dehaze by Big Hero 6</h1>
-    </div>
 
     <form class="Form" action="/dehaze" method="POST" enctype="multipart/form-data">
+        <h1>Dehaze by Big Hero 6</h1>
         <input type="file" id="upload-button" name="file">
-        <input type="number" id="inp" name="fps" placeholder="Frames per second">
         <label for="object_detection">Enable Object Detection</label>
         <input type="checkbox" id="object_detection" name="object_detection">
         <input type="submit" id="but" value="Upload and Dehaze">
