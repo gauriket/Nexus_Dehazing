@@ -1,9 +1,10 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import FileResponse
 import shutil
 import cv2
 import numpy as np
 import os
+import asyncio
 
 app = FastAPI()
 
@@ -69,19 +70,20 @@ def dehaze_video(input_path, output_path):
     dehazed2video(dehazed_array, output_path)
 
 @app.post("/dehaze")
-async def dehaze_endpoint(file: UploadFile):
+async def dehaze_endpoint(file: UploadFile = File(...), fps: int = Form(...)):
     if file.content_type != "video/mp4":
         return {"error": "Only MP4 videos are supported."}
 
-    # Save the uploaded video to a temporary file
-    with open("temp_video.mp4", "wb") as f:
+    input_video = "temp_video.mp4"
+    output_video = "output_video1.mp4"  # You can change the format as needed
+
+    with open(input_video, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
-    input_video = "temp_video.mp4"
-    output_video = "output_video.mp4"  # You can change the format as needed
+    await asyncio.to_thread(dehaze_video, input_video, output_video)
 
-    # Process the video
-    dehaze_video(input_video, output_video)
-
-    # Return the dehazed video as a downloadable file
     return FileResponse(output_video, media_type="video/mp4")
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
