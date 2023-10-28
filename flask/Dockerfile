@@ -1,6 +1,6 @@
 # Use an official Python runtime as a parent image
 
-FROM python:3.8
+FROM python:3.10
 
 # Set the working directory to /app
 
@@ -20,4 +20,4 @@ EXPOSE 80
 
 # Define the command to run your application
 
-CMD ["python", "app.py"]
+CMD ["python", "app2.py"]
