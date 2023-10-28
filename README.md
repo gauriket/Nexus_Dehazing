@@ -9,3 +9,10 @@ This is the Second checkpoint.....<br>
 After dinner and model improvement
 
 Final Commit;)
+
+Team Members - 
+Akash Patel
+Gauri Ket
+Shardul Anaspure
+Maanas Kumar
+Sanskruti Kambargi
