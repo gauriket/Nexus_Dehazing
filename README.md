@@ -8,11 +8,11 @@ Mentors were awesome.<br>
 This is the Second checkpoint.....<br>
 After dinner and model improvement
 
-Final Commit;)
+Final Commit;)<br>
 
-Team Members - 
-Akash Patel
-Gauri Ket
-Shardul Anaspure
-Maanas Kumar
-Sanskruti Kambargi
+Team Members - <br>
+Akash Patel<br>
+Gauri Ket<br>
+Shardul Anaspure<br>
+Maanas Kumar<br>
+Sanskruti Kambargi<br>
