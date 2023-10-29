@@ -36,8 +36,6 @@ For more details and technical information, please refer to the documentation pr
 
 # Collaborators
 
-@Ashackq
-@Sana-0511
-@gauriket
-@Minni27
-@Wardaddy16
+<p align="center"><a href="https://github.com/gauriket/Nexus_Dehazing/settings/access?query=filter%3Acollaborators">
+  <img src="https://contributors-img.web.app/image?repo=simranlotey/programs" />
+</a></p>
