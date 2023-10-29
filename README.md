@@ -35,7 +35,7 @@ We thank the dedicated team of engineers, data scientists, and first responders 
 For more details and technical information, please refer to the documentation provided.
 
 # Collaborators
-
-<p align="center"><a href="https://github.com/gauriket/Nexus_Dehazing/settings/access?query=filter%3Acollaborators">
-  <img src="https://contributors-img.web.app/image?repo=simranlotey/programs" />
-</a></p>
+@Sana-0511 @Minni27 @Wardaddy16 
+<a href="https://github.com/gauriket/Nexus_Dehazing/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=gauriket/Nexus_Dehazing" />
+</a>
